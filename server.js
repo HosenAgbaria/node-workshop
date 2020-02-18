@@ -6,6 +6,7 @@ const fs = require("fs");
 
 let handler = (req, res) => {
   let reqUrl = req.url;
+  console.log("req url ", reqUrl);
 
   if (reqUrl === "/") {
     res.writeHead(200, { "content-type": "text/html" });
@@ -27,9 +28,25 @@ let handler = (req, res) => {
     res.write("girls end point");
     res.end();
   } else {
-    res.writeHead(200, { "content-type": "text/html" });
-    res.write(message);
-    res.end();
+    let urlContentTye = toString(req.url).split(".")[1];
+    console.log('urlContentTye',urlContentTye);
+    
+    let contentTypes = {
+      html: "text/html",
+      css: "text/css",
+      jpeg: "image/jpeg",
+      js: "text/javascript",
+      jpg: "image/jpg",
+      png: "image/png"
+    };
+    res.writeHead(200, { "content-type": `${contentTypes[urlContentTye]}` });
+    fs.readFile(__dirname + `/public/${req.url}`, (err, file) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.end(file);
+    });
   }
 };
 const server = http.createServer(handler);
